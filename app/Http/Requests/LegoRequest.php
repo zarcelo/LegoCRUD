@@ -28,7 +28,7 @@ class LegoRequest extends FormRequest
             'name' => 'required',
             'description' => 'required',
             'url' => 'required',
-            // 'type' => 'required'
+            'type' => 'required'
         ];
     }
 
@@ -38,7 +38,7 @@ class LegoRequest extends FormRequest
             'name.required' => 'El campo name es obligatorio',
             'description.required' => 'El campo description es obligatorio',
             'url.required' => 'El campo url es obligatorio',
-            // 'type.required' => 'El campo es obligatorio'
+            'type.required' => 'El campo type es obligatorio'
         ];
     }
 }

@@ -26,7 +26,7 @@ class LegoController extends Controller
         $lego->name = $request->name;
         $lego->description = $request->description;
         $lego->url = $request->url;
-        $lego->type = "Hero";
+        $lego->type = $request->type;
         $lego->save();
 
         return $lego;
@@ -48,6 +48,7 @@ class LegoController extends Controller
         $lego->name = $request->name;
         $lego->description = $request->description;
         $lego->url = $request->url;
+        $lego->type = $request->type;
         $lego->save();
 
         return $lego;

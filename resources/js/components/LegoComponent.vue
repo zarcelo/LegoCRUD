@@ -18,6 +18,7 @@
                   </div>
                   <div class="col-sm-8">
                     <h5 class="card-title">{{ item.description }}</h5>
+                    <p class="card-text">{{ item.type }}</p>
                     <p class="card-text">
                       <button class="btn btn-warning btn-sm" @click="editForm(item, index)">Editar</button>
                       <button
@@ -34,17 +35,13 @@
       </div>
     </div>
 
-    <div v-if="allerrors!=[]" :class="['alert alert-success']" role="alert">
+    <div v-if="allerrors!=[]" :class="['alert alert-danger']" role="alert">
       <ul>
         <li v-for="(error, index) in allerrors" :key="index">{{ error[0] }}</li>
       </ul>
     </div>
 
-    <div
-      v-if="success"
-      :class="['alert alert-danger']"
-      role="alert"
-    >This is a success alert—check it out!</div>
+    <div v-if="success" :class="['alert alert-success']" role="alert">Se ha guardado correctamente!</div>
 
     <form @submit.prevent="handleEdit(lego)" v-if="modoEdit">
       <div class="card border-warning mb-3">
@@ -57,6 +54,10 @@
             placeholder="Description"
             v-model="lego.description"
           />
+          <select v-model="lego.type" class="form-control mb-2">
+            <option selected disabled value="0">Seleccionar...</option>
+            <option v-for="type in types" v-bind:key="type.value">{{ type.text }}</option>
+          </select>
           <input type="text" class="form-control mb-2" placeholder="URL" v-model="lego.url" />
           <button class="btn btn-warning" type="submit">Actualizar</button>
           <button class="btn btn-danger" type="submit" @click="cancelForm">Cancelar</button>
@@ -75,6 +76,10 @@
             placeholder="Description"
             v-model="lego.description"
           />
+          <select v-model="lego.type" class="form-control mb-2">
+            <option selected disabled value="0">Seleccionar...</option>
+            <option v-for="type in types" v-bind:key="type.value">{{ type.text }}</option>
+          </select>
           <input type="text" class="form-control mb-2" placeholder="URL" v-model="lego.url" />
           <button class="btn btn-primary" type="submit">Agregar</button>
         </div>
@@ -95,10 +100,14 @@ export default {
   data() {
     return {
       legos: [],
-      lego: { name: "", description: "", url: "" },
+      lego: { name: "", description: "", url: "", type: "" },
       modoEdit: false,
       allerrors: "",
-      success: false
+      success: false,
+      types: [
+        { value: "Villain", text: "Villain" },
+        { value: "Hero", text: "Hero" }
+      ]
     };
   },
   created() {
@@ -117,12 +126,13 @@ export default {
       }
     },
     clearForm() {
-      this.lego = { name: "", description: "", url: "" };
+      this.lego = { name: "", description: "", url: "", type: "" };
     },
     editForm(item) {
       this.lego.name = item.name;
       this.lego.description = item.description;
       this.lego.url = item.url;
+      this.lego.type = item.type;
       this.lego.id = item.id;
       this.modoEdit = true;
     },
@@ -134,7 +144,8 @@ export default {
       const params = {
         name: lego.name,
         description: lego.description,
-        url: lego.url
+        url: lego.url,
+        type: lego.type
       };
       try {
         await axios.put(`/api/legos/${lego.id}`, params).then(res => {
@@ -143,6 +154,7 @@ export default {
           const index = this.legos.findIndex(item => item.id === lego.id);
           this.getLegos();
         });
+        this.clearForm();
       } catch (error) {
         console.log(error);
         toastr.error("Error");
@@ -159,13 +171,14 @@ export default {
             this.legos.push(legoServidor);
             this.clearForm();
             this.success = true;
+            this.allerrors = "";
           })
           .catch(error => {
             this.allerrors = error.response.data.errors;
             this.success = false;
           });
       } catch (error) {
-        console.log("ZAR" + error);
+        console.log(error);
         toastr.error("Error");
       }
     },
